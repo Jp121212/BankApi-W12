@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+model User {
+  id          Int      @id @default(autoincrement())
+  name        String
+  lastName    String
+  email       String   @unique
+  password    String
+  address     String?
+  phoneCode   String?
+  phoneNumber String?
+  createdAt   DateTime @default(now())
+  Account     Account?
+  Savings    Saving[]
+  Payments   Payment[]
+}
+
+model Account {
+  id       Int      @id @default(autoincrement())
+  iban    String   @unique
+  balance  Int
+  number  String   @unique
+  userId   Int     @unique  
+  user     User     @relation(fields: [userId], references: [id])
+  currencyPS Int @unique
+  currrency Currency @relation(fields: [currencyPS], references: [currencyId])
+  createdAt DateTime @default(now())
+
+}
+
+model Currency {
+  currencyId       Int      @id @default(autoincrement())
+  name     String   @unique
+  symbol   String   @unique
+  Account  Account[]
+  createdAt DateTime @default(now())
+}
+
+model Saving {
+  id       Int      @id @default(autoincrement())
+  name     String
+  amount   Int
+  userId   Int
+  user     User     @relation(fields: [userId], references: [id])
+  startDate DateTime @default(now())
+  endDate   DateTime 
+}
+
+model Payment{
+  id       Int      @id @default(autoincrement())
+  detail   String
+  amount   Int
+  userId   Int
+  user     User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
+
